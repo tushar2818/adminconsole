@@ -9,7 +9,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   templateUrl: 'city.component.html'
 })
-
+//test commit
 export class CityComponent { 
   dtOptions: DataTables.Settings = {};
   citys: any = [];
