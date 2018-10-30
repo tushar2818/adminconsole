@@ -1,5 +1,17 @@
 export const navItems = [
   {
+    name: 'Masters',
+    url: '/city',
+    icon: 'icon-puzzle',
+    children: [
+      {
+        name: 'City Master',
+        url: '/city/city',
+        icon: 'icon-puzzle'
+      },
+    ]
+  },
+  {
     name: 'Dashboard',
     url: '/dashboard',
     icon: 'icon-speedometer',
@@ -25,19 +37,7 @@ export const navItems = [
   {
     title: true,
     name: 'Components'
-  },
-  {
-    name: 'City',
-    url: '/city',
-    icon: 'icon-puzzle',
-    children: [
-      {
-        name: 'City Master',
-        url: '/city/city',
-        icon: 'icon-puzzle'
-      },
-    ]
-  },
+  }, 
   {
     name: 'Test',
     url: '/fortest',

@@ -1,45 +1,60 @@
-import { Component, ViewChild, ChangeDetectionStrategy, Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { Component, ViewChild, ChangeDetectionStrategy, Injectable, TemplateRef  } from '@angular/core';
 import { CityService } from './city.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner'; 
+import { GlobalSettings, AlertType } from '../../shared/globalsettings';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+
+declare var $: any;
 
 @Component({
   templateUrl: 'city.component.html'
 })
-//test commit
+
 export class CityComponent { 
-  dtOptions: DataTables.Settings = {};
-  citys: any = [];
+  modalRef: BsModalRef;
+  model: any;
+  citys: any = []; 
+  cityTypes: any = []; 
 
   constructor(
     private _service: CityService,
     private toastr: ToastrService,
-    private spinner: NgxSpinnerService
-  ) {
+    private spinner: NgxSpinnerService,
+   private modalService: BsModalService) {
   } 
    
   ngOnInit() {
-    this.dtOptions = {
-      pagingType: 'full_numbers'
-    };
+    this.model = {};
+    this.cityTypes = GlobalSettings.cityTpes;
     this.refreshDataSource();
-  }
+  } 
 
   refreshDataSource() {
     this.spinner.show();
     this._service.getAllCity().subscribe(item => {
       if (item.IsSuccess) {
         this.citys = item.Result;
+        GlobalSettings.ApplyDataTableStyles();
       }
-      setTimeout(this.afterDataPopulated, 50);
+      else {
+        GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.GetErrorStringFromListOfErrors(item.ErrorMessages), AlertType.Error);
+      }
       this.spinner.hide();
-    });
+    },
+      error => {
+        GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.TEXT_ERROR_API, AlertType.Error);
+        this.spinner.hide();
+      });
+  } 
+
+  openModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(template, GlobalSettings.defaultModalconfig);
+    GlobalSettings.addDefaultModalSettings();
   }
 
-  afterDataPopulated() {
-    $('#datatables').DataTable();
-  } 
+  onSave(model: any, IsVallid: boolean) { 
+  }
+
 }
