@@ -3,6 +3,7 @@ import { navItems } from './../../_nav';
 import { AppService } from '../../app.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // <== add the imports!
+import { GlobalSettings, AlertType } from '../../shared/globalsettings';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,16 +40,21 @@ export class DefaultLayoutComponent {
   }
 
   refreshDataSource() {
+    this.spinner.show();
     this._service.getCityForPlaceBio().subscribe(result => {
       if (result.IsSuccess) {
         this.citys = result.Result;
         this.selectedCityId = this.citys[0].Id;
       }
+      else {
+        GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.GetErrorStringFromListOfErrors(result.ErrorMessages), AlertType.Error);
+      }
       this.spinner.hide();
     },
       error => {
-        alert(error);
+        GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.TEXT_ERROR_API, AlertType.Error);
         this.spinner.hide();
       });
   }
+
 }

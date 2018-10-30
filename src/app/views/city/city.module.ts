@@ -19,7 +19,8 @@ import { DataTablesModule } from 'angular-datatables';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SweetAlert2Module } from '@toverux/ngx-sweetalert2';
 import { NgxSpinnerModule } from 'ngx-spinner';
-
+// Modal Component
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 @NgModule({
   imports: [
@@ -38,7 +39,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     NgSelectModule,
     DataTablesModule,
     SweetAlert2Module.forRoot(),
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    ModalModule.forRoot()
   ],
   declarations: [
     CityComponent,

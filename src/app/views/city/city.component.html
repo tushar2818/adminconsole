@@ -1,24 +1,103 @@
-<table id="datatables" class="table table-striped table-bordered" style="width:100%">
-  <thead>
-    <tr>
-      <th>City Type</th>
-      <th>City Name</th>
-      <th>State</th>
-      <th>Distinct</th>
-      <th>Taluka</th>
-      <th>Active</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let city of citys; let i = index">
-      <th>{{city.CityType}}</th>
-      <th>{{city.CityName}}</th>
-      <th>{{city.CityState}}</th>
-      <th>{{city.CityDistrict}}</th>
-      <th>{{city.CityTaluka}}</th>
-      <th>{{city.IsActive}}</th>
-      <th></th>
-    </tr>
-  </tbody>
-</table>
+
+<div class="card border-primary">
+  <div class="card-header text-white bg-primary">
+    <i class="fa fa-align-justify"></i> City Details     
+    <button class="icon-button float-right text-white" (click)="refreshDataSource()"><i class="fa fa-refresh fa-lg"></i> Refresh</button>
+    <button class="icon-button float-right text-white" (click)="openModal(template)"><i class="fa fa-plus-square-o fa-lg"></i> Add New</button>
+  </div>
+
+  <div class="card-body">
+    <table id="datatables" class="table table-striped table-bordered hover" style="width:100%">
+      <thead>
+        <tr>
+          <th>Sr.</th>
+          <th>City Type</th>
+          <th>City Name</th>
+          <th>State</th>
+          <th>Distinct</th>
+          <th>Taluka</th>
+          <th>Active</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let city of citys; let i = index">
+          <th>{{city.Sr}}</th>
+          <th>{{city.CityTypeText}}</th>
+          <th>{{city.CityName}}</th>
+          <th>{{city.StateName}}</th>
+          <th>{{city.DistrictName}}</th>
+          <th>{{city.TalukaName}}</th>
+          <th>{{city.IsActive}}</th>
+          <th></th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<ng-template #template>
+  <form #f="ngForm" novalidate (ngSubmit)="onSave(f.value, f.valid)" class="was-validated">
+
+    <div class="modal-header">
+      <h4 class="modal-title">City Details</h4>
+      <button type="button" class="close" (click)="modalRef.hide()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      
+      <div cityTypess="form-group">
+        <label class="form-col-form-label">City Type</label>
+        <select class="form-control" id="CityType" name="CityType" [(ngModel)]="model.CityType" required>
+          <option *ngFor="let typ of cityTypes; let i = index" value="{{typ.Id}}">{{typ.Type}}</option>
+        </select>
+        <div class="invalid-feedback">
+          City Type is required
+        </div>
+      </div>
+
+        <div class="form-group" *ngIf="model.CityType>'1'" >
+          <label class="form-col-form-label" for="StateId">State</label>
+          <select class="form-control" id="StateId" name="StateId" [(ngModel)]="model.StateId" required>
+                <option *ngFor="let typ of cityTypes; let i = index" value="{{typ.Id}}">{{typ.Type}}</option>
+          </select> 
+          <div class="invalid-feedback">
+            State is required
+          </div>
+        </div>
+
+      <div class="form-group" *ngIf="model.CityType>'2'">
+          <label class="form-col-form-label" for="DistrictId">District</label>
+          <select class="form-control" id="DistrictId" name="DistrictId" [(ngModel)]="model.DistrictId" required>
+                <option *ngFor="let typ of cityTypes; let i = index" value="{{typ.Id}}">{{typ.Type}}</option>
+          </select> 
+          <div class="invalid-feedback">
+            District is required
+          </div>
+        </div>
+
+      <div class="form-group" *ngIf="model.CityType>'3'">
+          <label class="form-col-form-label" for="TalukaId">Taluka</label>
+          <select class="form-control" id="TalukaId" name="TalukaId" [(ngModel)]="model.TalukaId" required>
+                <option *ngFor="let typ of cityTypes; let i = index" value="{{typ.Id}}">{{typ.Type}}</option>
+          </select> 
+          <div class="invalid-feedback">
+            Taluka is required
+          </div>
+        </div> 
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Close</button>
+      <button type="submit" class="btn btn-primary">Save changes</button>
+    </div>
+
+  </form>
+</ng-template>
+
+ 
+
+
