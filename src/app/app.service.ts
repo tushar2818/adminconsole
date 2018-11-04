@@ -9,26 +9,24 @@ import { GlobalSettings } from './shared/globalsettings';
 
 @Injectable()
 export class AppService {
-    constructor(private _http: Http) { }
-    private RegenerateData = new Subject<number>();
-    // Observable string streams
-    RegenerateData$ = this.RegenerateData.asObservable();
-  public componentUrl = "cityforplacebio"
-    getHeader(): Headers {
-      return new Headers(GlobalSettings.HeaderStringCity);
-    }
+  constructor(private _http: Http) { }
+  private RegenerateData = new Subject<number>();
+  RegenerateData$ = this.RegenerateData.asObservable();
+  public componentUrl = GlobalSettings.BASE_API_ENDPOINT_CITY + "city/";
+  getHeader(): Headers {
+    return new Headers(GlobalSettings.HeaderStringCity);
+  }
 
   getCityForPlaceBio(): Observable<any> {
     let options = new RequestOptions({ headers: this.getHeader() });
-    let url = GlobalSettings.BASE_API_ENDPOINT_CITY + this.componentUrl;
+    let url = this.componentUrl + "getcitiesforplacebio";
     return this._http.get(url, options)
       .map((response: Response) => <any>response.json())
-      .do(data => console.log(url + " => " + JSON.stringify(data)))
+      .do(data => { })
       .catch(this.handleErrorPromise);
   }
-    
+
   protected handleErrorPromise(error: any): Promise<void> {
-    //alert(JSON.stringify(error));
     try {
       error = JSON.parse(error._body);
     } catch (e) {
@@ -42,7 +40,7 @@ export class AppService {
           ? error._body
           : error.status
             ? `${error.status} - ${error.statusText}`
-            : 'Errorr'; 
+            : 'Errorr';
     return Promise.reject(errMsg);
   }
 }

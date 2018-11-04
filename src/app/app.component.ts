@@ -22,16 +22,5 @@ export class AppComponent implements OnInit {
       }
       window.scrollTo(0, 0);
     });
-
-    //this.refreshDataSource();
-
-  }
-
-  refreshDataSource() {
-    this._service.getCityForPlaceBio().subscribe(item => {
-      if (item.IsSuccess) {
-        this.citys = item.Result;
-      }
-    });
   }
 }

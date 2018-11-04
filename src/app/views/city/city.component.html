@@ -1,9 +1,10 @@
 
 <div class="card border-primary">
-  <div class="card-header text-white bg-primary">
-    <i class="fa fa-align-justify"></i> City Details     
+
+  <div class="card-header text-white bg-primary custom-card-header">
+    <i class="fa fa-align-justify center-vertical"></i> City Details
     <button class="icon-button float-right text-white" (click)="refreshDataSource()"><i class="fa fa-refresh fa-lg"></i> Refresh</button>
-    <button class="icon-button float-right text-white" (click)="openModal(template)"><i class="fa fa-plus-square-o fa-lg"></i> Add New</button>
+    <button class="icon-button float-right text-white" (click)="onSaveUpdate(template)"><i class="fa fa-plus-square-o fa-lg"></i> Add New</button>
   </div>
 
   <div class="card-body">
@@ -11,8 +12,9 @@
       <thead>
         <tr>
           <th>Sr.</th>
+          <th>City</th>
+          <th>City OL</th>
           <th>City Type</th>
-          <th>City Name</th>
           <th>State</th>
           <th>Distinct</th>
           <th>Taluka</th>
@@ -21,83 +23,169 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let city of citys; let i = index">
-          <th>{{city.Sr}}</th>
-          <th>{{city.CityTypeText}}</th>
-          <th>{{city.CityName}}</th>
-          <th>{{city.StateName}}</th>
-          <th>{{city.DistrictName}}</th>
-          <th>{{city.TalukaName}}</th>
-          <th>{{city.IsActive}}</th>
-          <th></th>
+        <tr *ngFor="let row of citys; let i = index">
+          <td>{{row.Sr}}</td>
+          <td class="custom-hyperlink" (click)="onSaveUpdate(template,row)"><a>{{row.CityName}}</a> </td>
+          <td>{{row.CityNameInOL}}</td>
+          <td>{{row.CityTypeText}}</td>
+          <td>{{row.StateName}}</td>
+          <td>{{row.DistrictName}}</td>
+          <td>{{row.TalukaName}}</td>
+          <td>{{row.IsActive}}</td>
+          <td class="custom-hyperlink" (click)="onSaveUpdate(template,row,false)"><a>Details</a> </td>
         </tr>
       </tbody>
     </table>
   </div>
+
 </div>
 
 <ng-template #template>
+
   <form #f="ngForm" novalidate (ngSubmit)="onSave(f.value, f.valid)" class="was-validated">
 
-    <div class="modal-header">
-      <h4 class="modal-title">City Details</h4>
-      <button type="button" class="close" (click)="modalRef.hide()" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
+    <div class="modal-header card-header custom-modal-header">
+      <h5 class="modal-title">&nbsp;<i class="fa fa-info-circle"></i> &nbsp; City Details</h5>
+      <button type="button" class="icon-button float-right text-white" (click)="modalRef.hide()"><i class="fa fa-remove fa-lg"></i></button>
     </div>
 
     <div class="modal-body">
-      
-      <div cityTypess="form-group">
-        <label class="form-col-form-label">City Type</label>
-        <select class="form-control" id="CityType" name="CityType" [(ngModel)]="model.CityType" required>
-          <option *ngFor="let typ of cityTypes; let i = index" value="{{typ.Id}}">{{typ.Type}}</option>
-        </select>
-        <div class="invalid-feedback">
-          City Type is required
+
+      <div *ngIf="isAddUpdate">
+        <div class="row col-md-12">
+          <div class="col-md-3">
+            <div cityTypess="form-group">
+              <label class="form-col-form-label">City Type</label>
+              <select [disabled]="model.Id!=null && model.Id!=0" class="form-control" id="CityType" name="CityType" [(ngModel)]="model.CityType" required (ngModelChange)="refreshSource('CityType')">
+                <option *ngFor="let typ of cityTypes; let i = index" value="{{typ.Id}}">{{typ.Type}}</option>
+              </select>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                City Type is required
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3" *ngIf="model.CityType>'1'">
+            <div class="form-group">
+              <label class="form-col-form-label" for="StateId">State</label>
+              <select class="form-control" id="StateId" name="StateId" [(ngModel)]="model.StateId" required (ngModelChange)="refreshSource('State')">
+                <option *ngFor="let typ of states; let i = index" value="{{typ.Id}}">{{typ.CityName}}</option>
+              </select>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                State is required
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3" *ngIf="model.CityType>'2'">
+            <div class="form-group">
+              <label class="form-col-form-label" for="DistrictId">District</label>
+              <select class="form-control" id="DistrictId" name="DistrictId" [(ngModel)]="model.DistrictId" required (ngModelChange)="refreshSource('District')">
+                <option *ngFor="let typ of districts; let i = index" value="{{typ.Id}}">{{typ.CityName}}</option>
+              </select>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                District is required
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3" *ngIf="model.CityType>'3'">
+            <div class="form-group">
+              <label class="form-col-form-label" for="TalukaId">Taluka</label>
+              <select class="form-control" id="TalukaId" name="TalukaId" [(ngModel)]="model.TalukaId" required>
+                <option *ngFor="let typ of talukas; let i = index" value="{{typ.Id}}">{{typ.CityName}}</option>
+              </select>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                Taluka is required
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row col-md-12">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-col-form-label" for="CityName">City Name</label>
+              <input type="text" class="form-control" id="CityName" name="CityName" [(ngModel)]="model.CityName" required>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                City Name is required
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-col-form-label" for="PinCode">PinCode</label>
+              <input type="text" class="form-control" id="PinCode" name="PinCode" [(ngModel)]="model.PinCode" />
+            </div>
+            <div class="form-group">
+              <label class="form-col-form-label" for="Latitude">Latitude</label>
+              <input type="text" class="form-control" id="Latitude" name="Latitude" [(ngModel)]="model.Latitude" />
+            </div>
+            <div class="form-group">
+              <label class="form-col-form-label" for="Longitude">Longitude</label>
+              <input type="text" class="form-control" id="Longitude" name="Longitude" [(ngModel)]="model.Longitude" />
+            </div>
+            <div class="form-group">
+              <label class="checkbox-container">
+                For Flex
+                <input type="checkbox" id="ForFlex" name="ForFlex" [(ngModel)]="model.ForFlex">
+                <span class="checkmark"></span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-container">
+                Active
+                <input type="checkbox" id="IsActive" name="IsActive" [(ngModel)]="model.IsActive">
+                <span class="checkmark"></span>
+              </label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-col-form-label" for="CityNameInOL">City Name In OL</label>
+              <input type="text" class="form-control" id="CityNameInOL" name="CityNameInOL" [(ngModel)]="model.CityNameInOL" required>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                City Name In OL is required
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-col-form-label" for="MPopulation">Male Population</label>
+              <input type="text" class="form-control" id="MPopulation" name="MPopulation" [(ngModel)]="model.MPopulation" />
+            </div>
+            <div class="form-group">
+              <label class="form-col-form-label" for="FPopulation">Female Population</label>
+              <input type="text" class="form-control" id="FPopulation" name="FPopulation" [(ngModel)]="model.FPopulation" />
+            </div>
+            <div class="form-group">
+              <label class="form-col-form-label" for="CityNameInOL">Station Code</label>
+              <input type="text" class="form-control" id="StationCode" name="StationCode" [(ngModel)]="model.StationCode" />
+            </div>
+            <div class="form-group">
+              <label class="checkbox-container">
+                For PlaceBio
+                <input type="checkbox" id="ForPlaceBio" name="ForPlaceBio" [(ngModel)]="model.ForPlaceBio" />
+                <span class="checkmark"></span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-container">
+                Deleted
+                <input type="checkbox" id="IsDeleted" name="IsDeleted" [(ngModel)]="model.IsDeleted">
+                <span class="checkmark"></span>
+              </label>
+            </div>
+          </div>
         </div>
       </div>
 
-        <div class="form-group" *ngIf="model.CityType>'1'" >
-          <label class="form-col-form-label" for="StateId">State</label>
-          <select class="form-control" id="StateId" name="StateId" [(ngModel)]="model.StateId" required>
-                <option *ngFor="let typ of cityTypes; let i = index" value="{{typ.Id}}">{{typ.Type}}</option>
-          </select> 
-          <div class="invalid-feedback">
-            State is required
-          </div>
+      <div *ngIf="!isAddUpdate" class="row">
+        <div *ngFor="let o of generateArray(model)" class="col-md-6">
+          <p><strong>{{o.Key}} : </strong> {{o.Value}}</p>
         </div>
-
-      <div class="form-group" *ngIf="model.CityType>'2'">
-          <label class="form-col-form-label" for="DistrictId">District</label>
-          <select class="form-control" id="DistrictId" name="DistrictId" [(ngModel)]="model.DistrictId" required>
-                <option *ngFor="let typ of cityTypes; let i = index" value="{{typ.Id}}">{{typ.Type}}</option>
-          </select> 
-          <div class="invalid-feedback">
-            District is required
-          </div>
-        </div>
-
-      <div class="form-group" *ngIf="model.CityType>'3'">
-          <label class="form-col-form-label" for="TalukaId">Taluka</label>
-          <select class="form-control" id="TalukaId" name="TalukaId" [(ngModel)]="model.TalukaId" required>
-                <option *ngFor="let typ of cityTypes; let i = index" value="{{typ.Id}}">{{typ.Type}}</option>
-          </select> 
-          <div class="invalid-feedback">
-            Taluka is required
-          </div>
-        </div> 
+      </div>
 
     </div>
 
     <div class="modal-footer">
+      <button *ngIf="isAddUpdate" type="submit" class="btn btn-primary" [disabled]="f.invalid">Save</button>
+      <button *ngIf="!isAddUpdate" type="submit" class="btn btn-danger">Delete</button>
       <button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Close</button>
-      <button type="submit" class="btn btn-primary">Save changes</button>
     </div>
 
   </form>
+
 </ng-template>
-
- 
-
-

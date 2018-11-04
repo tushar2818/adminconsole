@@ -6,45 +6,70 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/catch';
 import { GlobalSettings } from '../../shared/globalsettings';
-declare var swal: any;
-
 @Injectable()
 export class CityService {
-    constructor(private _http: Http) { }
-    private RegenerateData = new Subject<number>();
-    // Observable string streams
-    RegenerateData$ = this.RegenerateData.asObservable();
-  public componentUrl = "cityall";
+  constructor(private _http: Http) { }
+  private RegenerateData = new Subject<number>();
+  public componentUrl = GlobalSettings.BASE_API_ENDPOINT_CITY + "city/";
+  RegenerateData$ = this.RegenerateData.asObservable();
   getHeader(): Headers {
     return new Headers(GlobalSettings.HeaderStringCity);
   }
 
-  getAllCity(): Observable<any> {
+  get(): Observable<any> {
     let options = new RequestOptions({ headers: this.getHeader() });
-    let url = GlobalSettings.BASE_API_ENDPOINT_CITY + this.componentUrl;
+    let url = this.componentUrl + "getall";
     return this._http.get(url, options)
       .map((response: Response) => <any>response.json())
-      .do(data => console.log("url => " + JSON.stringify(data)))
+      .do(data => { })
       .catch(this.handleErrorPromise);
   }
-    
-    protected handleErrorPromise(error: any): Promise<void> {
-        try {
-            error = JSON.parse(error._body);
-        } catch (e) {
-        }
 
-        let errMsg = error.errorMessage
-            ? error.errorMessage
-            : error.message
-                ? error.message
-                : error._body
-                    ? error._body
-                    : error.status
-                        ? `${error.status} - ${error.statusText}`
-                        : 'Errorr';
+  getById(Id, issaveupdate): Observable<any> {
+    let options = new RequestOptions({ headers: this.getHeader() });
+    let url = this.componentUrl + "getbyid/" + Id + "/" + issaveupdate;
+    return this._http.get(url, options)
+      .map((response: Response) => <any>response.json())
+      .do(data => { })
+      .catch(this.handleErrorPromise);
+  }
 
-      console.log(errMsg);
-        return Promise.reject(errMsg);
+  post(model): Observable<any> {
+    let options = new RequestOptions({ headers: this.getHeader() });
+    let url = this.componentUrl + "SaveUpdate";
+    let postBody = JSON.stringify(model);
+    return this._http.post(url, postBody, options)
+      .map((response: Response) => <any>response.json())
+      .do(data => { })
+      .catch(this.handleErrorPromise);
+  }
+
+  delete(id): Observable<any> {
+    let options = new RequestOptions({ headers: this.getHeader() });
+    let url = this.componentUrl + id;
+    return this._http.delete(url, options)
+      .map((response: Response) => <any>response.json())
+      .do(data => { })
+      .catch(this.handleErrorPromise);
+  }
+
+  protected handleErrorPromise(error: any): Promise<void> {
+    try {
+      error = JSON.parse(error._body);
+    } catch (e) {
     }
+
+    let errMsg = error.errorMessage
+      ? error.errorMessage
+      : error.message
+        ? error.message
+        : error._body
+          ? error._body
+          : error.status
+            ? `${error.status} - ${error.statusText}`
+            : 'Errorr';
+
+    console.log(errMsg);
+    return Promise.reject(errMsg);
+  }
 }
