@@ -17,7 +17,8 @@ export class CityComponent {
   modalRef: BsModalRef;
   model: any;
   isAddUpdate: boolean;
-  citys: any = [];
+  modelHeaders: any = [];
+  modellist: any = [];
   cityTypes: any = [];
   states: any = [];
   districts: any = [];
@@ -32,15 +33,17 @@ export class CityComponent {
 
   ngOnInit() {
     this.model = {};
+    this.modelHeaders = ["Sr.", "City", "City OL", "City Type", "State", "Distinct", "Taluka", "Active"];
     this.cityTypes = GlobalSettings.cityTypes;
     this.refreshDataSource();
   }
 
   refreshDataSource(showMessage: boolean = false, id: any = null, isDelete: boolean = false) {
     this.spinner.show();
+    this.modellist = null;
     this._service.get().subscribe(item => {
       if (item.IsSuccess) {
-        this.citys = item.Result;
+        this.modellist = item.Result;
         GlobalSettings.ApplyDataTableStyles();
       }
       else {
@@ -101,7 +104,7 @@ export class CityComponent {
           this.model.TalukaId = null;
         }
         cityTypeId = GlobalSettings.GetCityTypeIdFromUniqueKey(GlobalSettings.stateUniqueKey);
-        this.states = this.citys.filter(function (o) { return o.CityType == cityTypeId; });
+        this.states = this.modellist.filter(function (o) { return o.CityType == cityTypeId; });
         break;
       case "State":
         this.districts = [];
@@ -112,7 +115,7 @@ export class CityComponent {
         }
         stateId = this.model.StateId;
         cityTypeId = GlobalSettings.GetCityTypeIdFromUniqueKey(GlobalSettings.districtUniqueKey);
-        this.districts = this.citys.filter(function (o) { return o.CityType == cityTypeId && o.StateId == stateId; });
+        this.districts = this.modellist.filter(function (o) { return o.CityType == cityTypeId && o.StateId == stateId; });
         break;
       case "District":
         this.talukas = [];
@@ -122,7 +125,7 @@ export class CityComponent {
         stateId = this.model.StateId;
         let districtId = this.model.DistrictId;
         cityTypeId = GlobalSettings.GetCityTypeIdFromUniqueKey(GlobalSettings.talukaUniqueKey);
-        this.talukas = this.citys.filter(function (o) { return o.CityType == cityTypeId && o.StateId == stateId && o.DistrictId == districtId; });
+        this.talukas = this.modellist.filter(function (o) { return o.CityType == cityTypeId && o.StateId == stateId && o.DistrictId == districtId; });
         break;
       default:
     }

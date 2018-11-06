@@ -13,18 +13,18 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { DataTablesModule } from 'angular-datatables';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SweetAlert2Module } from '@toverux/ngx-sweetalert2';
-import { NgxSpinnerModule } from 'ngx-spinner'; 
+import { NgxSpinnerModule } from 'ngx-spinner';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
-import { CityComponent } from './city.component';
-import { CityRoutingModule } from './city-routing.module';
-import { CityService } from './city.service';
+import { BusStandComponent } from './busstand.component';
+import { BusStandRoutingModule } from './busstand-routing.module';
+import { BusStandService } from './busstand.service';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    CityRoutingModule,
+    BusStandRoutingModule,
     BsDropdownModule.forRoot(),
     TabsModule,
     CarouselModule.forRoot(),
@@ -41,10 +41,10 @@ import { CityService } from './city.service';
     ModalModule.forRoot()
   ],
   declarations: [
-    CityComponent,
+    BusStandComponent,
   ],
   providers: [
-    CityService
+    BusStandService
   ]
 })
-export class CityModule { }
+export class BusStandModule { }
