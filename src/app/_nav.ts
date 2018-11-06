@@ -1,12 +1,22 @@
 export const navItems = [
   {
     name: 'Masters',
-    url: '/city',
+    url: '/master',
     icon: 'icon-puzzle',
     children: [
       {
         name: 'City Master',
-        url: '/city/city',
+        url: '/master/city',
+        icon: 'icon-puzzle'
+      },
+      {
+        name: 'Bus Type Master',
+        url: '/master/bustype',
+        icon: 'icon-puzzle'
+      },
+      {
+        name: 'Bus Stand Master',
+        url: '/master/busstand',
         icon: 'icon-puzzle'
       },
     ]

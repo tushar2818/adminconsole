@@ -36,7 +36,8 @@ export class DefaultLayoutComponent {
   }
 
   cityChanged() {
-    alert(this.selectedCityId);
+    localStorage.setItem("CityId", this.selectedCityId.toString());
+    window.location.reload();
   }
 
   refreshDataSource() {
@@ -44,7 +45,13 @@ export class DefaultLayoutComponent {
     this._service.getCityForPlaceBio().subscribe(result => {
       if (result.IsSuccess) {
         this.citys = result.Result;
-        this.selectedCityId = this.citys[0].Id;
+        let tempSelectedId = this.citys[0].Id;
+        let existingSelectedCityId = localStorage.getItem('CityId');
+        if (existingSelectedCityId != null && existingSelectedCityId != "") {
+          tempSelectedId = +existingSelectedCityId;
+        }
+        this.selectedCityId = tempSelectedId;
+        localStorage.setItem("CityId", this.selectedCityId.toString());
       }
       else {
         GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.GetErrorStringFromListOfErrors(result.ErrorMessages), AlertType.Error);

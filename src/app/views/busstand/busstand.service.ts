@@ -8,16 +8,16 @@ import 'rxjs/add/operator/catch';
 import { GlobalSettings } from '../../shared/globalsettings';
 
 @Injectable()
-export class CityService {
+export class BusStandService {
   constructor(private _http: Http) { }
   private RegenerateData = new Subject<number>();
-  public componentUrl = GlobalSettings.BASE_API_ENDPOINT_CITY + "city/";
+  public componentUrl = GlobalSettings.BASE_API_ENDPOINT_CITY + "busstandmaster/";
   RegenerateData$ = this.RegenerateData.asObservable();
   getHeader(): Headers {
     return new Headers(GlobalSettings.HeaderStringCity);
   }
 
-  get(): Observable<any> {
+  getall(): Observable<any> {
     let options = new RequestOptions({ headers: this.getHeader() });
     let url = this.componentUrl + "getall";
     return this._http.get(url, options)
@@ -26,9 +26,9 @@ export class CityService {
       .catch(this.handleErrorPromise);
   }
 
-  getById(Id, issaveupdate): Observable<any> {
+  getById(Id): Observable<any> {
     let options = new RequestOptions({ headers: this.getHeader() });
-    let url = this.componentUrl + "getbyid/" + Id + "/" + issaveupdate;
+    let url = this.componentUrl + "getbyid/" + Id;
     return this._http.get(url, options)
       .map((response: Response) => <any>response.json())
       .do(data => { })
