@@ -26,7 +26,7 @@
       <select class="form-control" id="selectedCityId" name="selectedCityId"  [(ngModel)]="selectedCityId" 
               (ngModelChange)="cityChanged()" >
         <option value="0" disabled >Select City</option>
-        <option *ngFor="let city of citys; let i = index" value="{{city.Id}}">{{city.CityName}}</option>
+        <option *ngFor="let city of citys; let i = index" value="{{city.Key}}">{{city.Value}}</option>
       </select>
     </li>
 

@@ -19,6 +19,11 @@ export const navItems = [
         url: '/master/busstand',
         icon: 'icon-puzzle'
       },
+      {
+        name: 'Bus Time Table',
+        url: '/master/bustimetable',
+        icon: 'icon-puzzle'
+      },
     ]
   },
   {

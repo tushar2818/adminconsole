@@ -5,24 +5,26 @@ import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/catch';
-import { GlobalSettings } from './shared/globalsettings';
+import { GlobalSettings, LookupDetail, LookupType } from './shared/globalsettings';
+import { EventEmitter } from 'events';
 
 @Injectable()
 export class AppService {
-  constructor(private _http: Http) { }
+  loadCompleted: EventEmitter = new EventEmitter();
+  isLoaded: boolean = false;
   private RegenerateData = new Subject<number>();
   RegenerateData$ = this.RegenerateData.asObservable();
-  public componentUrl = GlobalSettings.BASE_API_ENDPOINT_CITY + "city/";
-  getHeader(): Headers {
-    return new Headers(GlobalSettings.HeaderStringCity);
-  }
+  public componentUrl = GlobalSettings.BASE_API_ENDPOINT_CITY + "lookup/";
 
-  getCityForPlaceBio(): Observable<any> {
-    let options = new RequestOptions({ headers: this.getHeader() });
-    let url = this.componentUrl + "getcitiesforplacebio";
-    return this._http.get(url, options)
+  constructor(private _http: Http) { } 
+
+  getLookup(lookupDetails: any): Observable<any> {
+    let options = new RequestOptions({ headers: GlobalSettings.getHeaderStringCity() });
+    let url = this.componentUrl + "getall";
+    let body = JSON.stringify(lookupDetails);
+    return this._http.post(url, body, options)
       .map((response: Response) => <any>response.json())
-      .do(data => { })
+      .do(data => {  })
       .catch(this.handleErrorPromise);
   }
 

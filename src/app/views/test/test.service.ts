@@ -14,13 +14,10 @@ export class TestService {
     private RegenerateData = new Subject<number>();
     // Observable string streams
     RegenerateData$ = this.RegenerateData.asObservable();
-  public componentUrl = "cityforplacebio"
-    getHeader(): Headers {
-      return new Headers(GlobalSettings.HeaderStringCity);
-    }
+  public componentUrl = "cityforplacebio" 
 
   get(): Observable<any> {
-    let options = new RequestOptions({ headers: this.getHeader() });
+    let options = new RequestOptions({ headers: GlobalSettings.getHeaderStringCity() });
     let url = GlobalSettings.BASE_API_ENDPOINT_CITY + this.componentUrl;
     return this._http.get(url, options)
       .map((response: Response) => <any>response.json())

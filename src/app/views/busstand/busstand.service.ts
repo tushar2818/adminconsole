@@ -12,13 +12,10 @@ export class BusStandService {
   constructor(private _http: Http) { }
   private RegenerateData = new Subject<number>();
   public componentUrl = GlobalSettings.BASE_API_ENDPOINT_CITY + "busstandmaster/";
-  RegenerateData$ = this.RegenerateData.asObservable();
-  getHeader(): Headers {
-    return new Headers(GlobalSettings.HeaderStringCity);
-  }
+  RegenerateData$ = this.RegenerateData.asObservable(); 
 
   getall(): Observable<any> {
-    let options = new RequestOptions({ headers: this.getHeader() });
+    let options = new RequestOptions({ headers: GlobalSettings.getHeaderStringCity() });
     let url = this.componentUrl + "getall";
     return this._http.get(url, options)
       .map((response: Response) => <any>response.json())
@@ -27,7 +24,7 @@ export class BusStandService {
   }
 
   getById(Id): Observable<any> {
-    let options = new RequestOptions({ headers: this.getHeader() });
+    let options = new RequestOptions({ headers: GlobalSettings.getHeaderStringCity() });
     let url = this.componentUrl + "getbyid/" + Id;
     return this._http.get(url, options)
       .map((response: Response) => <any>response.json())
@@ -36,7 +33,7 @@ export class BusStandService {
   }
 
   post(model): Observable<any> {
-    let options = new RequestOptions({ headers: this.getHeader() });
+    let options = new RequestOptions({ headers: GlobalSettings.getHeaderStringCity() });
     let url = this.componentUrl + "saveupdate";
     let postBody = JSON.stringify(model);
     return this._http.post(url, postBody, options)
@@ -46,7 +43,7 @@ export class BusStandService {
   }
 
   delete(id): Observable<any> {
-    let options = new RequestOptions({ headers: this.getHeader() });
+    let options = new RequestOptions({ headers: GlobalSettings.getHeaderStringCity() });
     let url = this.componentUrl + id;
     return this._http.delete(url, options)
       .map((response: Response) => <any>response.json())

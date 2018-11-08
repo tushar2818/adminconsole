@@ -1,0 +1,132 @@
+<div class="card border-primary">
+
+  <div class="card-header text-white bg-primary custom-card-header">
+    <i class="fa fa-align-justify center-vertical"></i> Bus Time Table
+    <button class="icon-button float-right text-white" (click)="refreshDataSource()"><i class="fa fa-refresh fa-lg"></i> Refresh</button>
+    <button class="icon-button float-right text-white" (click)="onAddUpdate(template)"><i class="fa fa-plus-square-o fa-lg"></i> Add New</button>
+  </div>
+
+  <div class="card-body">
+    <table id="datatables" class="table table-striped table-bordered hover" style="width:100%">
+      <thead>
+        <tr>
+          <th *ngFor="let header of modelHeaders; let i = index">{{header}}</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of modellist; let i = index">
+          <td>{{ (i+1) }}</td>
+          <td class="custom-hyperlink" (click)="onAddUpdate(template,row)"><a>{{row.SourceCitys.CityName}}</a> </td>
+          <td>{{row.DestinationCitys.CityName}}</td>
+          <td>{{row.BusStandMaster.StandName}}</td>
+          <td>{{row.BusTypeMaster.BusType}}</td>
+          <td>{{row.IsActive}}</td>
+          <!--<td class="custom-hyperlink" (click)="onDelete(row.Id)"><a>Delete</a> </td>-->
+          <td class="custom-hyperlink" (click)="onAddUpdate(template,row,true)"><a>Details</a> </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<ng-template #template>
+
+  <form #f="ngForm" novalidate (ngSubmit)="onSave(f.value, f.valid)" class="was-validated">
+
+    <div class="modal-header card-header custom-modal-header">
+      <h5 class="modal-title">&nbsp;<i class="fa fa-info-circle"></i> &nbsp; Bus Time Table Details</h5>
+      <button type="button" class="icon-button float-right text-white" (click)="modalRef.hide()"><i class="fa fa-remove fa-lg"></i></button>
+    </div>
+
+    <div class="modal-body">
+
+      <div *ngIf="!isDetailView">
+        <div class="row col-md-12">
+          <div class="col-md-6">
+            <div cityTypess="form-group">
+              <label class="form-col-form-label">Bus Stand</label>
+              <select class="form-control" id="BusStandId" name="BusStandId" [(ngModel)]="model.BusStandId" required>
+                <option *ngFor="let model of this.lookups['BusStands']; let i = index" value="{{model.Key}}">{{model.Value}}</option>
+              </select>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                Bus Stand is required
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-col-form-label">Bus Type</label>
+              <select class="form-control" id="BusTypeId" name="BusTypeId" [(ngModel)]="model.BusTypeId" required>
+                <option *ngFor="let model of this.lookups['BusTypes']; let i = index" value="{{model.Key}}">{{model.Value}}</option>
+              </select>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                Bus Type is required
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-col-form-label">Source City</label>
+              <label class="red-color"> &nbsp; * </label>
+              <ng-select [items]="this.lookups['CityAll']" bindLabel="Value" bindValue="Key"
+                         id="SourceCityId" name="SourceCityId" [(ngModel)]="model.SourceCityId" required>
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-col-form-label">Destination City</label>
+              <label class="red-color"> &nbsp; * </label>
+              <ng-select [items]="this.lookups['CityAll']" bindLabel="Value" bindValue="Key"
+                         id="DestinationCityId" name="DestinationCityId" [(ngModel)]="model.DestinationCityId" required>
+              </ng-select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row col-md-12">
+          <div class="form-group col-md-6 ">
+            <label class="form-col-form-label">Via</label>
+            <input type="text" class="form-control" id="Via" name="Via" [(ngModel)]="model.Via">
+          </div>
+          <div class="form-group col-md-6">
+            <label class="form-col-form-label">Via OL</label>
+            <input type="text" class="form-control" id="ViaInOL" name="ViaInOL" [(ngModel)]="model.ViaInOL">
+          </div>
+          <div class="form-group col-md-6">
+            <label class="form-col-form-label">Times</label>
+            <textarea type="text" class="form-control textarea-height" id="Times" name="Times"
+                      [(ngModel)]="model.Times" required></textarea>
+            <div class="invalid-feedback" [hidden]="!f.submitted">
+              Time is required
+            </div>
+          </div>
+          <div class="form-group col-md-6">
+            <label class="form-col-form-label">Times OL</label>
+            <textarea type="text" class="form-control textarea-height" id="TimesInOL" name="TimesInOL"
+                      [(ngModel)]="model.TimesInOL" required></textarea>
+            <div class="invalid-feedback" [hidden]="!f.submitted">
+              Time OL is required
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div *ngIf="!isDetailView">
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid">Save</button>
+      <button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Close</button>
+    </div>
+
+  </form>
+
+</ng-template>
+

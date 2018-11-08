@@ -1,37 +1,59 @@
-import { Component, ViewChild, ChangeDetectionStrategy, Injectable, TemplateRef } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
+import { Component, TemplateRef } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { GlobalSettings, AlertType } from '../../shared/globalsettings';
+import { GlobalSettings, AlertType, LookupDetail, LookupType  } from '../../shared/globalsettings';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import swal from 'sweetalert2';
-import { SweetAlertType } from 'sweetalert2';
-import { BusStandService } from './busstand.service';
+import { BusTimeTableService } from './bustimetable.service';
+import { Subscription } from 'rxjs/Subscription';
 import { AppService } from '../../app.service';
 declare var $: any;
+
 @Component({
-  templateUrl: 'busstand.component.html'
+  templateUrl: 'bustimetable.component.html'
 })
 
-export class BusStandComponent {
+export class BusTimeTableComponent {
+  subscription: Subscription;  //variable to store the resource for this component in order to dispose/destroy when page unload
   modalRef: BsModalRef;
   model: any;
   modellist: any = [];
   modelHeaders: any = [];
+  lookups: any = [];
+  isDetailView: boolean = false;
 
   constructor(
     private _appservice: AppService,
-    private _service: BusStandService,
-    private toastr: ToastrService,
+    private _service: BusTimeTableService,
     private spinner: NgxSpinnerService,
     private modalService: BsModalService) {
   }
 
   ngOnInit() {
     this.model = {};
-    this.modelHeaders = ["Sr.", "Bus Stand", "Bus Stand OL", "Created Date", "Updated Date", "Active"];
-    this.refreshDataSource();
-  } 
+    this.modelHeaders = ["Sr.", "Source", "Destination", "Bus Stand", "Bus Type", "Active"];
+    this.getLookups();
+  }
+
+  getLookups() {
+    let lookupDetails: [LookupDetail, LookupDetail, LookupDetail] = [{ LookupType: LookupType.CityAll, Parameters: null },
+    { LookupType: LookupType.BusStands, Parameters: null }, { LookupType: LookupType.BusTypes, Parameters: null }];
+
+    this.subscription = this._appservice.getLookup(lookupDetails).subscribe(item => {
+      if (item.IsSuccess) {
+        this.lookups = item.Result;
+        this.refreshDataSource();
+      }
+      else {
+        GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.GetErrorStringFromListOfErrors(item.ErrorMessages), AlertType.Error);
+        this.spinner.hide();
+      }
+    },
+      error => {
+        GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.TEXT_ERROR_API, AlertType.Error);
+        this.spinner.hide();
+      });
+  }
 
   refreshDataSource(showMessage: boolean = false, id: any = null, isDelete: boolean = false) {
     this.spinner.show();
@@ -55,15 +77,16 @@ export class BusStandComponent {
       });
   }
 
-  onAddUpdate(template: TemplateRef<any>, model: any = null) {
+  onAddUpdate(template: TemplateRef<any>, model: any = null, isDetailView: boolean = false) {
+    this.isDetailView = isDetailView;
     if (model == null) {
-      this.model = { IsActive: true };
+      this.model = { IsActive: true, SourceCityId: GlobalSettings.getCity() };
       this.modalRef = this.modalService.show(template, GlobalSettings.defaultModalconfig);
       GlobalSettings.addDefaultModalSettings();
     }
     else {
       this.spinner.show();
-      this._service.getById(model.Id).subscribe(item => {
+      this._service.getById(model.Id, isDetailView).subscribe(item => {
         if (item.IsSuccess) {
           this.model = item.Result;
           this.modalRef = this.modalService.show(template, GlobalSettings.defaultModalconfig);
@@ -131,6 +154,11 @@ export class BusStandComponent {
         GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.TEXT_ERROR_API, AlertType.Error);
         this.spinner.hide();
       });
+  }
+
+  //standard function : to destroy the resourc, free out the memory
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   generateArray(obj) {
