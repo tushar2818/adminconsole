@@ -1,34 +1,40 @@
 import swal from 'sweetalert2';
 import { SweetAlertType } from 'sweetalert2';
+import { Headers } from '@angular/http';
+
 declare var $: any;
 
 export class GlobalSettings {
   //api details
   public static BASE_API_ENDPOINT_CITY = 'http://localhost:31497/api/';
 
-  //api header details
-  public static HeaderStringCity = {
-    'Content-Type': 'application/json',
-    'ApplicationId': GlobalSettings.getCity(),
-    'ApplicationToken': "2"
+  public static getHeaderStringCity(): Headers {
+    let headerStringCity = {
+      'Content-Type': 'application/json',
+      'ApplicationId': GlobalSettings.getCity(),
+      'ApplicationToken': "2"
+    };
+    return new Headers(headerStringCity);
   };
 
-  public static getCity(): string {
-    var existingCity = localStorage.getItem('CityId');
+  public static getCity(): number {
+    var existingCity = localStorage.getItem("CityId");
     if (existingCity != null) {
-      return existingCity.toString(); 
+      return +existingCity.toString();
     }
     else {
-      return "";
+      return 0;
     }
   }
-
+ 
   //city unique keys
   static stateUniqueKey = "State";
   static districtUniqueKey = "District";
   static talukaUniqueKey = "Taluka";
   static villageUniqueKey = "Village";
   static areaUniqueKey = "Area";
+  static cityIdUniqueKey = "CityId";
+
   static cityTypes = [{ Id: 1, Type: 'State', cityType: GlobalSettings.stateUniqueKey }, { Id: 2, Type: 'District', cityType: GlobalSettings.districtUniqueKey }, { Id: 3, Type: 'Taluka', cityType: GlobalSettings.talukaUniqueKey }, { Id: 4, Type: 'Village', cityType: GlobalSettings.villageUniqueKey }, { Id: 5, Type: 'Area', cityType: GlobalSettings.areaUniqueKey }];
   static GetCityTypeIdFromUniqueKey(uniqueKey: string): number {
     let type = GlobalSettings.cityTypes.filter(function (o) { return o.cityType == uniqueKey; })[0];
@@ -107,4 +113,19 @@ export enum AlertType {
   Warning,
   Info,
   Question
+}
+
+export enum LookupType {
+  CityForPlaceBio,
+  CityAll,
+  BusTypes,
+  BusStands
+}
+
+export enum LookupParameter {
+}
+
+export class LookupDetail {
+  public LookupType: LookupType;
+  public Parameters: any;
 }

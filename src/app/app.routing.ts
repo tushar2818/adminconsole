@@ -61,6 +61,10 @@ export const routes: Routes = [
         loadChildren: './views/busstand/busstand.module#BusStandModule'
       },
       {
+        path: 'master',
+        loadChildren: './views/bustimetable/bustimetable.module#BusTimeTableModule'
+      },
+      {
         path: 'fortest',
         loadChildren: './views/test/test.module#TestModule'
       },{
