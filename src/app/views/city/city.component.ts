@@ -16,13 +16,14 @@ declare var $: any;
 export class CityComponent {
   modalRef: BsModalRef;
   model: any;
-  isAddUpdate: boolean;
   modelHeaders: any = [];
   modellist: any = [];
   cityTypes: any = [];
   states: any = [];
   districts: any = [];
   talukas: any = [];
+  isDetailView: boolean = false;
+  deleteId: number = 0;
 
   constructor(
     private _service: CityService,
@@ -51,6 +52,7 @@ export class CityComponent {
       }
       this.spinner.hide();
       if (showMessage) {
+        this.modalRef.hide();
         GlobalSettings.ShowMessageFromResponse(id, isDelete);
       }
     },
@@ -60,16 +62,18 @@ export class CityComponent {
       });
   }
 
-  onSaveUpdate(template: TemplateRef<any>, model: any = null, isAddUpdate: boolean = true) {
-    this.isAddUpdate = isAddUpdate;
+  onSaveUpdate(template: TemplateRef<any>, model: any = null, isDetailView: boolean = false) {
+    this.isDetailView = isDetailView;
     if (model == null) {
+      this.deleteId = 0;
       this.model = { IsActive: true };
       this.modalRef = this.modalService.show(template, GlobalSettings.defaultModalconfig);
       GlobalSettings.addDefaultModalSettings();
     }
     else {
       this.spinner.show();
-      this._service.getById(model.Id, isAddUpdate).subscribe(item => {
+      this.deleteId = model.Id;
+      this._service.getById(model.Id, isDetailView).subscribe(item => {
         if (item.IsSuccess) {
           this.model = item.Result;
           this.refreshSource("CityType", false);
@@ -134,51 +138,52 @@ export class CityComponent {
   onSave(model: any, IsVallid: boolean) {
     console.log("Model => " + JSON.stringify(this.model));
     if (IsVallid) {
-      if (this.isAddUpdate) {
-        this.spinner.show();
-        this._service.post(this.model).subscribe(item => {
-          if (item.IsSuccess) {
-            this.modalRef.hide();
-            this.refreshDataSource(true, this.model.Id);
-          }
-          else {
-            GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.GetErrorStringFromListOfErrors(item.ErrorMessages), AlertType.Error);
-            this.spinner.hide();
-          }
-        },
-          error => {
-            GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.TEXT_ERROR_API, AlertType.Error);
-            this.spinner.hide();
-          });
+      this.spinner.show();
+      this._service.post(this.model).subscribe(item => {
+        if (item.IsSuccess) {
+          this.refreshDataSource(true, this.model.Id);
+        }
+        else {
+          GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.GetErrorStringFromListOfErrors(item.ErrorMessages), AlertType.Error);
+          this.spinner.hide();
+        }
+      },
+        error => {
+          GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.TEXT_ERROR_API, AlertType.Error);
+          this.spinner.hide();
+        });
+    }
+  }
+
+  onDelete(Id: any) {
+    swal({
+      title: GlobalSettings.TEXT_CONFIRM_TITLE,
+      text: GlobalSettings.TEXT_CONFIRM_MESSAGE,
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: GlobalSettings.TEXT_CONFIRM_DELETE
+    }).then((result) => {
+      if (result.value) {
+        this.perFormDelete(Id);
+      }
+    }, function (dismiss) { });
+  }
+
+  perFormDelete(Id: any) {
+    this.spinner.show();
+    this._service.delete(Id).subscribe(item => {
+      if (item.IsSuccess) {
+        this.refreshDataSource(true, Id, true);
       }
       else {
-        swal({
-          title: GlobalSettings.TEXT_CONFIRM_TITLE,
-          text: GlobalSettings.TEXT_CONFIRM_MESSAGE,
-          type: 'warning',
-          showCancelButton: true,
-          confirmButtonText: GlobalSettings.TEXT_CONFIRM_DELETE
-        }).then((result) => {
-          if (result.value) {
-            this.spinner.show();
-            this._service.delete(this.model.Id).subscribe(item => {
-              if (item.IsSuccess) {
-                this.modalRef.hide();
-                this.refreshDataSource(true, this.model.Id, true);
-              }
-              else {
-                GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.GetErrorStringFromListOfErrors(item.ErrorMessages), AlertType.Error);
-                this.spinner.hide();
-              }
-            },
-              error => {
-                GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.TEXT_ERROR_API, AlertType.Error);
-                this.spinner.hide();
-              });
-          }
-        }, function (dismiss) { });
+        GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.GetErrorStringFromListOfErrors(item.ErrorMessages), AlertType.Error);
+        this.spinner.hide();
       }
-    }
+    },
+      error => {
+        GlobalSettings.ShowMessage(GlobalSettings.TEXT_ERROR, GlobalSettings.TEXT_ERROR_API, AlertType.Error);
+        this.spinner.hide();
+      });
   }
 
   generateArray(obj) {

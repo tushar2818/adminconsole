@@ -21,6 +21,7 @@ export class BusTimeTableComponent {
   modelHeaders: any = [];
   lookups: any = [];
   isDetailView: boolean = false;
+  deleteId: number = 0;
 
   constructor(
     private _appservice: AppService,
@@ -36,6 +37,7 @@ export class BusTimeTableComponent {
   }
 
   getLookups() {
+    this.spinner.show();
     let lookupDetails: [LookupDetail, LookupDetail, LookupDetail] = [{ LookupType: LookupType.CityAll, Parameters: null },
     { LookupType: LookupType.BusStands, Parameters: null }, { LookupType: LookupType.BusTypes, Parameters: null }];
 
@@ -68,6 +70,7 @@ export class BusTimeTableComponent {
       }
       this.spinner.hide();
       if (showMessage) {
+        this.modalRef.hide();
         GlobalSettings.ShowMessageFromResponse(id, isDelete);
       }
     },
@@ -80,12 +83,14 @@ export class BusTimeTableComponent {
   onAddUpdate(template: TemplateRef<any>, model: any = null, isDetailView: boolean = false) {
     this.isDetailView = isDetailView;
     if (model == null) {
+      this.deleteId = 0;
       this.model = { IsActive: true, SourceCityId: GlobalSettings.getCity() };
       this.modalRef = this.modalService.show(template, GlobalSettings.defaultModalconfig);
       GlobalSettings.addDefaultModalSettings();
     }
     else {
       this.spinner.show();
+      this.deleteId = model.Id;
       this._service.getById(model.Id, isDetailView).subscribe(item => {
         if (item.IsSuccess) {
           this.model = item.Result;
@@ -110,7 +115,6 @@ export class BusTimeTableComponent {
       this.spinner.show();
       this._service.post(this.model).subscribe(item => {
         if (item.IsSuccess) {
-          this.modalRef.hide();
           this.refreshDataSource(true, this.model.Id);
         }
         else {
