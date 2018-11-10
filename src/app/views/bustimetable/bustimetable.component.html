@@ -22,7 +22,6 @@
           <td>{{row.BusStandMaster.StandName}}</td>
           <td>{{row.BusTypeMaster.BusType}}</td>
           <td>{{row.IsActive}}</td>
-          <!--<td class="custom-hyperlink" (click)="onDelete(row.Id)"><a>Delete</a> </td>-->
           <td class="custom-hyperlink" (click)="onAddUpdate(template,row,true)"><a>Details</a> </td>
         </tr>
       </tbody>
@@ -73,6 +72,9 @@
               <ng-select [items]="this.lookups['CityAll']" bindLabel="Value" bindValue="Key"
                          id="SourceCityId" name="SourceCityId" [(ngModel)]="model.SourceCityId" required>
               </ng-select>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                Source City required
+              </div>
             </div>
           </div>
           <div class="col-md-6">
@@ -82,6 +84,9 @@
               <ng-select [items]="this.lookups['CityAll']" bindLabel="Value" bindValue="Key"
                          id="DestinationCityId" name="DestinationCityId" [(ngModel)]="model.DestinationCityId" required>
               </ng-select>
+              <div class="invalid-feedback" [hidden]="!f.submitted">
+                Destination City required
+              </div>
             </div>
           </div>
         </div>
@@ -115,14 +120,17 @@
 
       </div>
 
-      <div *ngIf="!isDetailView">
-
+      <div *ngIf="isDetailView" class="row">
+        <div *ngFor="let o of generateArray(model)" class="col-md-6">
+          <p><strong>{{o.Key}} : </strong> {{o.Value}}</p>
+        </div>
       </div>
 
     </div>
 
     <div class="modal-footer">
-      <button type="submit" class="btn btn-primary" [disabled]="f.invalid">Save</button>
+      <button *ngIf="!isDetailView" type="submit" class="btn btn-primary" [disabled]="f.invalid">Save</button>
+      <button *ngIf="isDetailView" type="button" (click)="onDelete(deleteId)" class="btn btn-danger">Delete</button>
       <button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Close</button>
     </div>
 

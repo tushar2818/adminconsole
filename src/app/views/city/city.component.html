@@ -25,7 +25,7 @@
           <td>{{row.DistrictName}}</td>
           <td>{{row.TalukaName}}</td>
           <td>{{row.IsActive}}</td>
-          <td class="custom-hyperlink" (click)="onSaveUpdate(template,row,false)"><a>Details</a> </td>
+          <td class="custom-hyperlink" (click)="onSaveUpdate(template,row,true)"><a>Details</a> </td>
         </tr>
       </tbody>
     </table>
@@ -44,7 +44,7 @@
 
     <div class="modal-body">
 
-      <div *ngIf="isAddUpdate">
+      <div *ngIf="!isDetailView">
         <div class="row col-md-12">
           <div class="col-md-3">
             <div cityTypess="form-group">
@@ -165,7 +165,7 @@
         </div>
       </div>
 
-      <div *ngIf="!isAddUpdate" class="row">
+      <div *ngIf="isDetailView" class="row">
         <div *ngFor="let o of generateArray(model)" class="col-md-6">
           <p><strong>{{o.Key}} : </strong> {{o.Value}}</p>
         </div>
@@ -174,8 +174,8 @@
     </div>
 
     <div class="modal-footer">
-      <button *ngIf="isAddUpdate" type="submit" class="btn btn-primary" [disabled]="f.invalid">Save</button>
-      <button *ngIf="!isAddUpdate" type="submit" class="btn btn-danger">Delete</button>
+      <button *ngIf="!isDetailView" type="submit" class="btn btn-primary" [disabled]="f.invalid">Save</button>
+      <button *ngIf="isDetailView" type="button" (click)="onDelete(deleteId)" class="btn btn-danger">Delete</button>
       <button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Close</button>
     </div>
 
