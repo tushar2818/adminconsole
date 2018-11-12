@@ -27,6 +27,18 @@ export const navItems = [
     ]
   },
   {
+    name: 'User Management',
+    url: '/usermanagements',
+    icon: 'icon-puzzle',
+    children: [
+      {
+        name: 'Roles',
+        url: '/usermanagements/roles',
+        icon: 'icon-puzzle'
+      }
+    ]
+  },
+  {
     name: 'Dashboard',
     url: '/dashboard',
     icon: 'icon-speedometer',
