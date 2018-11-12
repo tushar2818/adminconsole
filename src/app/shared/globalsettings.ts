@@ -7,8 +7,16 @@ declare var $: any;
 export class GlobalSettings {
   //api details
   public static BASE_API_ENDPOINT_CITY = 'http://localhost:31497/api/';
-
   public static getHeaderStringCity(): Headers {
+    let headerStringCity = {
+      'Content-Type': 'application/json',
+      'ApplicationId': GlobalSettings.getCity(),
+      'ApplicationToken': "2"
+    };
+    return new Headers(headerStringCity);
+  };
+  public static BASE_API_ENDPOINT_IDENTITY = 'http://localhost:31713/api/';
+  public static getHeaderStringIDENTITY(): Headers {
     let headerStringCity = {
       'Content-Type': 'application/json',
       'ApplicationId': GlobalSettings.getCity(),
